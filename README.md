@@ -107,7 +107,13 @@ Image lokal bauen:
 docker build -t bg-stats:latest .
 ```
 
-Für ein veröffentlichtes Image kann der Container beispielsweise so ersetzt und gestartet werden:
+### Veröffentlichtes Image
+
+Die GitHub Action [`docker-image.yml`](.github/workflows/docker-image.yml) führt zuerst alle Maven-Tests aus und baut danach ein Image für `linux/amd64` und `linux/arm64`. Pull Requests werden nur gebaut. Bei einem Push auf `master` wird das Image in der GitHub Container Registry als `master`, `latest` und mit einem Commit-Tag wie `sha-a1b2c3d` veröffentlicht.
+
+Ein Git-Tag wie `v1.2.3` erzeugt zusätzlich die Image-Tags `1.2.3` und `1.2`. Der Workflow kann außerdem im Reiter **Actions** manuell gestartet werden. Zur Anmeldung an der Registry verwendet er automatisch `GITHUB_TOKEN`; es muss kein zusätzliches Secret angelegt werden.
+
+Das veröffentlichte Image kann beispielsweise so ersetzt und gestartet werden:
 
 ```bash
 docker rm -f bg-stats 2>/dev/null
@@ -119,12 +125,14 @@ docker run -d \
   -v "$(pwd)/data:/data" \
   -e BGG_API_KEY="dein-api-token" \
   -e BGG_USERNAME="dein-bgg-benutzername" \
-  ghcr.io/DEIN-NAME/bg-stats:latest
+  ghcr.io/jensgiehl/my-boardgame-stats:latest
 ```
 
 `8089` ist der Port auf dem Host; im Container lauscht die Anwendung auf Port `8080`. Der Ordner `data` im aktuellen Host-Verzeichnis wird nach `/data` eingebunden. Dort schreibt das Image standardmäßig `/data/bg-stats-data.json`.
 
 Für den Betrieb ohne API wird eine vorhandene `bg-stats-data.json` in den Host-Ordner `data` gelegt und zusätzlich `-e BGG_INPUT_FILE="/data/bg-stats-data.json"` angegeben. Für das lokal gebaute Image `bg-stats:latest` sollte `--pull=always` durch `--pull=never` ersetzt werden.
+
+Ist das Package in GitHub noch privat, muss es unter **Packages → Package settings → Change visibility** einmalig auf `Public` gestellt werden, damit das Image ohne Anmeldung heruntergeladen werden kann.
 
 ## Technischer Aufbau
 
