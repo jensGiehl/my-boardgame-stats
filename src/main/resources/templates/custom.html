@@ -80,6 +80,22 @@
             <article class="metric-card"><span class="metric-label">Spieltage</span><strong class="metric-value" th:text="${statistics.activeDays}">0</strong></article>
         </section>
 
+        <section class="whatsapp-share mb-4" aria-labelledby="whatsapp-share-title">
+            <div>
+                <p class="eyebrow text-accent mb-1">Teilen</p>
+                <h2 class="h5 mb-1" id="whatsapp-share-title">Statistik per WhatsApp teilen</h2>
+                <p class="text-secondary small mb-0">Kopiert für jedes enthaltene Spiel einen eigenen formatierten Statistikblock in deine Zwischenablage.</p>
+            </div>
+            <button class="btn btn-primary whatsapp-copy-button" type="button"
+                    data-copy-target="#whatsapp-statistics" aria-describedby="whatsapp-copy-status">
+                <span aria-hidden="true">📋</span>
+                <span data-copy-label>Für WhatsApp formatiert kopieren</span>
+            </button>
+            <textarea class="visually-hidden" id="whatsapp-statistics" readonly tabindex="-1"
+                      th:text="${@whatsAppStatistics.format(statistics)}"></textarea>
+            <span class="visually-hidden" id="whatsapp-copy-status" role="status" aria-live="polite"></span>
+        </section>
+
         <section class="row g-3 mb-5">
             <div class="col-12 col-sm-6 col-lg-3"><article class="insight-card h-100"><span>Favorit</span><strong th:text="${statistics.favoriteGame}">–</strong></article></div>
             <div class="col-12 col-sm-6 col-lg-3"><article class="insight-card h-100"><span>Ø pro Partie</span><strong th:text="${@humanDuration.formatMinutes(statistics.averageMinutes)}">–</strong></article></div>
@@ -140,5 +156,6 @@
     </section>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+<script th:src="@{/js/custom-statistics.js(v=20260815)}"></script>
 </body>
 </html>

@@ -410,6 +410,26 @@ a {
     flex: 1 1 12rem;
 }
 
+.whatsapp-share {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid rgba(20, 36, 29, .08);
+    border-radius: 1.15rem;
+    background:
+            radial-gradient(circle at 100% 0, rgba(207, 112, 71, .14), transparent 12rem),
+            var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.whatsapp-copy-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+}
+
 .tag-list {
     display: flex;
     flex-wrap: wrap;
@@ -776,6 +796,16 @@ a {
     }
 
     .filter-actions .btn {
+        flex: 0 0 auto;
+    }
+
+    .whatsapp-share {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .whatsapp-copy-button {
         flex: 0 0 auto;
     }
 }

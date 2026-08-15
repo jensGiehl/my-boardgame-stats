@@ -72,6 +72,10 @@ class StatisticsPagesTest {
         mockMvc.perform(get("/custom").param("category", "Strategy"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Eigene Statistik erstellen")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Für WhatsApp formatiert kopieren")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("*Catan*")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("*Verschiedene Spieltage:* 1")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("*Max. Spielzeit an einem Tag:* 2 Stunden und 30 Minuten")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Häufigste Kategorien")));
     }
 

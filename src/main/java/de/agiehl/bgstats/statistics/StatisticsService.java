@@ -124,17 +124,18 @@ public class StatisticsService {
         String ownerKey = ownerKey(catalog);
         List<GameStatistics> games = aggregateGames(plays, play -> true, ownerKey);
         long totalPlays = sumPlays(plays);
+        long totalMinutes = sumMinutes(plays);
         long wins = plays.stream().mapToLong(play -> play.winsFor(ownerKey)).sum();
         Double averageRating = averageRating(games);
         return new CustomStatistics(
                 filters,
                 totalPlays,
                 games.size(),
-                sumMinutes(plays),
+                totalMinutes,
                 wins,
                 totalPlays == 0 ? 0 : wins * 100.0 / totalPlays,
                 plays.stream().map(PlayRecord::date).distinct().count(),
-                totalPlays == 0 ? 0 : Math.round((double) sumMinutes(plays) / totalPlays),
+                totalPlays == 0 ? 0 : Math.round((double) totalMinutes / totalPlays),
                 averageRating,
                 favoriteGame(games),
                 firstDate(plays),
@@ -423,6 +424,7 @@ public class StatisticsService {
         private final Game game;
         private final Set<String> players = new HashSet<>();
         private final Map<String, Long> locations = new HashMap<>();
+        private final Map<LocalDate, Long> minutesPerDay = new HashMap<>();
         private long plays;
         private long totalMinutes;
         private long wins;
@@ -439,6 +441,7 @@ public class StatisticsService {
             wins += play.winsFor(winnerKey);
             firstPlay = firstPlay == null || play.date().isBefore(firstPlay) ? play.date() : firstPlay;
             lastPlay = lastPlay == null || play.date().isAfter(lastPlay) ? play.date() : lastPlay;
+            minutesPerDay.merge(play.date(), play.totalMinutes(), Long::sum);
             play.participants().stream().map(Participant::key).forEach(players::add);
             locations.merge(play.location(), (long) play.quantity(), Long::sum);
         }
@@ -454,6 +457,9 @@ public class StatisticsService {
                     game,
                     plays,
                     totalMinutes,
+                    minutesPerDay.size(),
+                    minutesPerDay.values().stream().mapToLong(Long::longValue).max().orElse(0),
+                    minutesPerDay.isEmpty() ? 0 : Math.round((double) totalMinutes / minutesPerDay.size()),
                     firstPlay,
                     lastPlay,
                     wins,

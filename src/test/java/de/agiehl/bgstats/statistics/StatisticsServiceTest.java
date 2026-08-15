@@ -106,11 +106,33 @@ class StatisticsServiceTest {
 
         assertThat(statistics.totalPlays()).isEqualTo(4);
         assertThat(statistics.totalMinutes()).isEqualTo(360);
+        assertThat(statistics.games().getFirst().activeDays()).isEqualTo(1);
+        assertThat(statistics.games().getFirst().maximumMinutesPerDay()).isEqualTo(360);
+        assertThat(statistics.games().getFirst().averageMinutesPerDay()).isEqualTo(360);
         assertThat(statistics.games()).extracting(game -> game.game().name()).containsExactly("Catan");
         assertThat(statistics.categories()).extracting(CategoryStatistics::name)
                 .containsExactly("Negotiation", "Strategy");
         assertThat(statistics.activity()).filteredOn(month -> month.label().equals("März"))
                 .extracting(ActivityStatistics::plays).containsExactly(4L);
+    }
+
+    @Test
+    void customStatisticsCalculateMaximumAndAverageTimePerDay() {
+        CustomStatistics statistics = service.custom(catalog, new FilterCriteria(null, null, null, null, null, null));
+
+        assertThat(statistics.games()).satisfiesExactly(
+                game -> {
+                    assertThat(game.game().name()).isEqualTo("Catan");
+                    assertThat(game.activeDays()).isEqualTo(2);
+                    assertThat(game.maximumMinutesPerDay()).isEqualTo(360);
+                    assertThat(game.averageMinutesPerDay()).isEqualTo(330);
+                },
+                game -> {
+                    assertThat(game.game().name()).isEqualTo("Azul");
+                    assertThat(game.activeDays()).isEqualTo(1);
+                    assertThat(game.maximumMinutesPerDay()).isEqualTo(240);
+                    assertThat(game.averageMinutesPerDay()).isEqualTo(240);
+                });
     }
 
     @Test
