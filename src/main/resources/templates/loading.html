@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Daten werden geladen')}"></head>
+<body class="loading-page">
+<main class="container min-vh-100 d-flex align-items-center justify-content-center py-4 py-sm-5">
+    <section id="catalog-loading" class="loading-card text-center"
+             th:data-status-url="@{/api/catalog/status}"
+             th:data-loading-state="${loadingStatus.state}">
+        <a class="navbar-brand d-inline-flex align-items-center gap-2 text-dark mb-5" th:href="@{/}">
+            <span class="brand-mark" aria-hidden="true">BG</span><span>Stats</span>
+        </a>
+
+        <div id="loading-progress" th:hidden="${loadingStatus.state.name() == 'FAILED'}">
+            <div class="loading-animation mx-auto mb-4" aria-hidden="true">
+                <span class="loading-orbit"></span>
+                <span class="loading-piece">BG</span>
+            </div>
+            <p class="eyebrow text-accent mb-2">Deine Statistik wird vorbereitet</p>
+            <h1 class="display-6 fw-bold mb-3">Bitte warten</h1>
+            <p id="loading-message" class="lead text-secondary mb-4" role="status" aria-live="polite"
+               th:text="${loadingStatus.message}">Deine BoardGameGeek-Daten werden vollständig geladen.</p>
+            <div class="loading-bar" aria-hidden="true"><span></span></div>
+            <p class="small text-secondary mt-3 mb-0">Die Seite öffnet sich automatisch, sobald alles bereit ist.</p>
+        </div>
+
+        <div id="loading-error" th:hidden="${loadingStatus.state.name() != 'FAILED'}" role="alert">
+            <span class="loading-error-icon" aria-hidden="true">!</span>
+            <p class="eyebrow text-accent mb-2">Laden fehlgeschlagen</p>
+            <h1 class="display-6 fw-bold mb-3">Das hat nicht geklappt</h1>
+            <p id="loading-error-message" class="lead text-secondary mb-4"
+               th:text="${loadingStatus.message}">Die Daten konnten nicht geladen werden.</p>
+            <form th:action="@{/loading/retry}" method="post">
+                <button class="btn btn-primary" type="submit">Erneut versuchen</button>
+            </form>
+        </div>
+
+        <noscript>
+            <p class="alert alert-warning mt-4 mb-0">JavaScript ist deaktiviert. Bitte lade diese Seite nach einem Moment neu.</p>
+        </noscript>
+    </section>
+</main>
+<script th:src="@{/js/loading.js}" defer></script>
+</body>
+</html>

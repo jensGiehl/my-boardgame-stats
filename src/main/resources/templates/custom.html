@@ -80,20 +80,35 @@
             <article class="metric-card"><span class="metric-label">Spieltage</span><strong class="metric-value" th:text="${statistics.activeDays}">0</strong></article>
         </section>
 
-        <section class="whatsapp-share mb-4" aria-labelledby="whatsapp-share-title">
+        <section class="statistics-share mb-4" aria-labelledby="statistics-share-title">
             <div>
                 <p class="eyebrow text-accent mb-1">Teilen</p>
-                <h2 class="h5 mb-1" id="whatsapp-share-title">Statistik per WhatsApp teilen</h2>
-                <p class="text-secondary small mb-0">Kopiert für jedes enthaltene Spiel einen eigenen formatierten Statistikblock in deine Zwischenablage.</p>
+                <h2 class="h5 mb-1" id="statistics-share-title">Statistik formatiert teilen</h2>
+                <p class="text-secondary small mb-0">Kopiert für jedes enthaltene Spiel einen eigenen Statistikblock für dein gewünschtes Ziel.</p>
             </div>
-            <button class="btn btn-primary whatsapp-copy-button" type="button"
-                    data-copy-target="#whatsapp-statistics" aria-describedby="whatsapp-copy-status">
-                <span aria-hidden="true">📋</span>
-                <span data-copy-label>Für WhatsApp formatiert kopieren</span>
-            </button>
+            <div class="statistics-share-actions">
+                <button class="btn btn-primary statistics-copy-button" type="button"
+                        data-copy-target="#whatsapp-statistics"
+                        data-copy-success="Die WhatsApp-Statistik wurde in die Zwischenablage kopiert."
+                        data-copy-error="Die WhatsApp-Statistik konnte nicht kopiert werden."
+                        aria-describedby="whatsapp-copy-status">
+                    <span aria-hidden="true">📋</span>
+                    <span data-copy-label>Für WhatsApp formatiert kopieren</span>
+                </button>
+                <button class="btn btn-outline-secondary statistics-copy-button" type="button"
+                        data-copy-target="#boardgamegeek-statistics"
+                        data-copy-success="Die BoardGameGeek-Statistik wurde in die Zwischenablage kopiert."
+                        data-copy-error="Die BoardGameGeek-Statistik konnte nicht kopiert werden."
+                        aria-describedby="boardgamegeek-copy-status">
+                    <span data-copy-label>Für BoardGameGeek formatiert kopieren</span>
+                </button>
+            </div>
             <textarea class="visually-hidden" id="whatsapp-statistics" readonly tabindex="-1"
                       th:text="${@whatsAppStatistics.format(statistics)}"></textarea>
+            <textarea class="visually-hidden" id="boardgamegeek-statistics" readonly tabindex="-1"
+                      th:text="${@boardGameGeekStatistics.format(statistics)}"></textarea>
             <span class="visually-hidden" id="whatsapp-copy-status" role="status" aria-live="polite"></span>
+            <span class="visually-hidden" id="boardgamegeek-copy-status" role="status" aria-live="polite"></span>
         </section>
 
         <section class="row g-3 mb-5">
@@ -156,6 +171,6 @@
     </section>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
-<script th:src="@{/js/custom-statistics.js(v=20260815)}"></script>
+<script th:src="@{/js/custom-statistics.js(v=20260815-2)}"></script>
 </body>
 </html>

@@ -410,7 +410,7 @@ a {
     flex: 1 1 12rem;
 }
 
-.whatsapp-share {
+.statistics-share {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -423,7 +423,13 @@ a {
     box-shadow: var(--shadow);
 }
 
-.whatsapp-copy-button {
+.statistics-share-actions {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+
+.statistics-copy-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -799,15 +805,6 @@ a {
         flex: 0 0 auto;
     }
 
-    .whatsapp-share {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .whatsapp-copy-button {
-        flex: 0 0 auto;
-    }
 }
 
 @media (min-width: 768px) {
@@ -843,6 +840,14 @@ a {
     .chart-track {
         grid-column: auto;
     }
+
+    .statistics-share-actions {
+        flex-direction: row;
+    }
+
+    .statistics-copy-button {
+        flex: 1 1 0;
+    }
 }
 
 @media (min-width: 992px) {
@@ -869,6 +874,21 @@ a {
 
     .filter-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .statistics-share {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .statistics-share-actions {
+        flex-direction: column;
+        flex: 0 0 auto;
+    }
+
+    .statistics-copy-button {
+        flex: 0 0 auto;
     }
 }
 

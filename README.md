@@ -14,6 +14,7 @@ BG Stats ist eine mobile-first Spring-Boot-Webanwendung für persönliche BoardG
 - Ortsstatistik mit Rangliste, Spielzeit, Personen, Spieltagen und den Spielen des gewählten Orts
 - frei kombinierbare Auswertung nach Jahr, Kategorie, Mitspieler, Ort, Spiel und Mindestwertung
 - WhatsApp-formatierten Export je enthaltenem Spiel mit Partien, Spieltagen, Gesamt-, Maximal- und Durchschnittszeit sowie erstem, letztem und dazwischenliegendem Datum per Zwischenablage
+- BoardGameGeek-formatierten Export derselben Statistik mit BGG-Spielverlinkung und ohne Emojis
 - responsive Balkendiagramme auf allen Statistikseiten für schnelle visuelle Vergleiche
 - asynchrones Laden des vollständigen Datenbestands beim Anwendungsstart mit einer automatisch verschwindenden Warteansicht
 - zeitbasierter In-Memory-Cache und manuelle Aktualisierung in der Navigation
