@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ortsstatistik')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navigation(${activePage}, ${username})}"></nav>
+<main class="container content-section">
+    <header class="page-heading">
+        <div>
+            <p class="eyebrow text-accent mb-1">Wo gespielt wird</p>
+            <h1 class="display-6 fw-bold mb-2">Statistik pro Ort</h1>
+            <p class="text-secondary mb-0">Finde heraus, an welchen Tischen die meiste Spielzeit entstanden ist.</p>
+        </div>
+        <form th:if="${!locations.empty}" class="filter-form" th:action="@{/locations}" method="get">
+            <label class="form-label" for="location">Ort auswählen</label>
+            <div class="input-group">
+                <select class="form-select" id="location" name="location">
+                    <option th:each="place : ${locations}" th:value="${place.name}" th:selected="${place.name == selectedLocation}"
+                            th:text="${place.name}">Ort</option>
+                </select>
+                <button class="btn btn-primary" type="submit">Anzeigen</button>
+            </div>
+        </form>
+    </header>
+
+    <section th:if="${statistics != null}">
+        <div class="location-title mb-4">
+            <span class="location-pin" aria-hidden="true">●</span>
+            <div><p class="eyebrow text-accent mb-1">Ausgewählter Ort</p><h2 class="h3 mb-0" th:text="${statistics.name}">Ort</h2></div>
+        </div>
+
+        <section class="metric-grid mb-4">
+            <article class="metric-card"><span class="metric-label">Partien</span><strong class="metric-value" th:text="${statistics.totalPlays}">0</strong></article>
+            <article class="metric-card"><span class="metric-label">Spiele</span><strong class="metric-value" th:text="${statistics.uniqueGames}">0</strong></article>
+            <article class="metric-card metric-card-wide"><span class="metric-label">Spielzeit</span><strong class="metric-value metric-value-text" th:text="${@humanDuration.formatMinutes(statistics.totalMinutes)}">0 Minuten</strong></article>
+            <article class="metric-card"><span class="metric-label">Personen</span><strong class="metric-value" th:text="${statistics.participants}">0</strong></article>
+            <article class="metric-card"><span class="metric-label">Spieltage</span><strong class="metric-value" th:text="${statistics.activeDays}">0</strong></article>
+        </section>
+
+        <section class="row g-3 mb-5">
+            <div class="col-12 col-md-6"><article class="insight-card h-100"><span>Meistgespielter Titel</span><strong th:text="${statistics.favoriteGame}">–</strong></article></div>
+            <div class="col-12 col-md-6"><article class="insight-card h-100"><span>Zeitraum</span><strong th:text="${@humanDuration.formatBetween(statistics.firstPlay, statistics.lastPlay)}">–</strong></article></div>
+        </section>
+
+        <section class="panel mb-5">
+            <div class="panel-heading"><div><p class="eyebrow text-accent mb-1">Tischchronik</p><h3 class="h4 mb-0">Spiele an diesem Ort</h3></div>
+                <span class="subtle-pill" th:text="${statistics.games.size() + ' Spiele'}">0 Spiele</span></div>
+            <div class="table-responsive">
+                <table class="table app-table align-middle mb-0">
+                    <thead><tr><th>Spiel</th><th>Partien</th><th>Spielzeit</th><th>Siege</th><th>Erste Partie</th><th>Letzte Partie</th></tr></thead>
+                    <tbody><tr th:each="game : ${statistics.games}">
+                        <td><a class="table-game-link" th:href="@{'https://boardgamegeek.com/boardgame/' + ${game.game.id}}" target="_blank" rel="noopener" th:text="${game.game.name}">Spiel</a></td>
+                        <td th:text="${game.plays}">0</td><td th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</td>
+                        <td th:text="${game.wins}">0</td><td th:text="${#temporals.format(game.firstPlay, 'dd.MM.yyyy')}">–</td><td th:text="${#temporals.format(game.lastPlay, 'dd.MM.yyyy')}">–</td>
+                    </tr></tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+
+    <section class="panel chart-panel mb-5" th:if="${!locations.empty}" aria-labelledby="location-chart-title">
+        <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Ortsvergleich</p><h2 class="h4 mb-0" id="location-chart-title">Spielzeit nach Ort</h2></div><span class="subtle-pill">Top 10</span></div>
+        <div class="bar-chart" role="img" aria-label="Balkendiagramm der zehn Orte mit der höchsten Spielzeit">
+            <div class="chart-row" th:each="place, chartStat : ${locations}" th:if="${chartStat.index < 10}">
+                <span class="chart-label" th:text="${place.name}">Ort</span>
+                <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${locations[0].totalMinutes == 0 ? 0 : place.totalMinutes * 100.0 / locations[0].totalMinutes}%|"></span></span>
+                <strong class="chart-value" th:text="${@humanDuration.formatMinutes(place.totalMinutes)}">0 Minuten</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel" th:if="${!locations.empty}">
+        <div class="panel-heading"><div><p class="eyebrow text-accent mb-1">Alle Spielorte</p><h2 class="h4 mb-0">Rangliste nach Spielzeit</h2></div></div>
+        <div class="table-responsive">
+            <table class="table app-table align-middle mb-0">
+                <thead><tr><th>Ort</th><th>Partien</th><th>Spielzeit</th><th>Spiele</th><th>Personen</th><th>Zeitraum</th></tr></thead>
+                <tbody><tr th:each="place : ${locations}" th:classappend="${place.name == selectedLocation} ? 'selected-row'">
+                    <td><a class="table-game-link" th:href="@{/locations(location=${place.name})}" th:text="${place.name}">Ort</a></td>
+                    <td th:text="${place.plays}">0</td><td th:text="${@humanDuration.formatMinutes(place.totalMinutes)}">0 Minuten</td>
+                    <td th:text="${place.uniqueGames}">0</td><td th:text="${place.participants}">0</td>
+                    <td th:text="${@humanDuration.formatBetween(place.firstPlay, place.lastPlay)}">–</td>
+                </tr></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section th:if="${locations.empty}" class="empty-state">
+        <span class="empty-icon" aria-hidden="true">◇</span><h2 class="h4">Noch keine Orte vorhanden</h2>
+        <p class="mb-0">Für diesen BGG-Account wurden keine Plays gefunden.</p>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

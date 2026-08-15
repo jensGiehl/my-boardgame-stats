@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Personenstatistik')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navigation(${activePage}, ${username})}"></nav>
+<main class="container content-section">
+    <header class="page-heading align-items-end">
+        <div>
+            <p class="eyebrow text-accent mb-1">Gemeinsam am Tisch</p>
+            <h1 class="display-6 fw-bold mb-2">Statistik pro Person</h1>
+            <p class="text-secondary mb-0">Durchsuche BGG-Benutzernamen und Namen aus deinem Spielverlauf.</p>
+        </div>
+        <form class="filter-form user-search" th:action="@{/users}" method="get" role="search">
+            <label class="form-label" for="user-query">Person suchen</label>
+            <div class="input-group">
+                <input class="form-control" id="user-query" name="q" type="search" th:value="${query}"
+                       placeholder="Name oder BGG-Username" autocomplete="off">
+                <button class="btn btn-primary" type="submit">Suchen</button>
+            </div>
+        </form>
+    </header>
+
+    <div class="row g-4 align-items-start">
+        <aside class="col-12 col-lg-4">
+            <section class="panel participant-panel">
+                <div class="panel-heading compact">
+                    <div><p class="eyebrow text-accent mb-1">Treffer</p><h2 class="h5 mb-0">Personen</h2></div>
+                    <span class="subtle-pill" th:text="${participants.size()}">0</span>
+                </div>
+                <div class="participant-list" th:if="${!participants.empty}">
+                    <a th:each="participant : ${participants}" class="participant-item"
+                       th:classappend="${participant.key == selectedKey} ? 'active'"
+                       th:href="@{/users(user=${participant.key},q=${query})}">
+                        <span class="participant-avatar" th:text="${#strings.substring(participant.displayName, 0, 1).toUpperCase()}">A</span>
+                        <span class="participant-copy">
+                            <strong th:text="${participant.displayName}">Name</strong>
+                            <small th:text="${participant.username == null ? 'ohne BGG-Username' : '@' + participant.username}">@user</small>
+                        </span>
+                        <span class="participant-count" th:text="${participant.plays}">0</span>
+                    </a>
+                </div>
+                <div th:if="${participants.empty}" class="p-4 text-secondary">Keine passende Person gefunden.</div>
+            </section>
+        </aside>
+
+        <div class="col-12 col-lg-8">
+            <div th:if="${statistics != null}">
+                <section class="profile-heading mb-4">
+                    <span class="profile-avatar" th:text="${#strings.substring(statistics.participant.displayName, 0, 1).toUpperCase()}">A</span>
+                    <div><p class="eyebrow text-accent mb-1">Persönliche Bilanz</p><h2 class="h3 mb-1" th:text="${statistics.participant.displayName}">Name</h2>
+                        <p class="text-secondary mb-0" th:if="${statistics.participant.username != null}" th:text="${'@' + statistics.participant.username}">@user</p></div>
+                </section>
+
+                <section class="metric-grid compact-grid mb-4">
+                    <article class="metric-card"><span class="metric-label">Partien</span><strong class="metric-value" th:text="${statistics.totalPlays}">0</strong></article>
+                    <article class="metric-card"><span class="metric-label">Spiele</span><strong class="metric-value" th:text="${statistics.uniqueGames}">0</strong></article>
+                    <article class="metric-card metric-card-wide"><span class="metric-label">Spielzeit</span><strong class="metric-value metric-value-text" th:text="${@humanDuration.formatMinutes(statistics.totalMinutes)}">0 Minuten</strong></article>
+                    <article class="metric-card"><span class="metric-label">Siege</span><strong class="metric-value" th:text="${statistics.wins}">0</strong></article>
+                    <article class="metric-card"><span class="metric-label">Siegquote</span><strong class="metric-value metric-value-small" th:text="${#numbers.formatDecimal(statistics.winRate, 1, 1, 'COMMA') + ' %'}">0 %</strong></article>
+                </section>
+
+                <section class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6"><article class="insight-card h-100"><span>Lieblingsspiel</span><strong th:text="${statistics.favoriteGame}">–</strong></article></div>
+                    <div class="col-12 col-sm-6"><article class="insight-card h-100"><span>Spielzeitraum</span><strong th:text="${@humanDuration.formatBetween(statistics.firstPlay, statistics.lastPlay)}">–</strong></article></div>
+                </section>
+
+                <section class="panel chart-panel mb-4" th:if="${!statistics.games.empty}" aria-labelledby="person-chart-title">
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Spielprofil</p><h3 class="h5 mb-0" id="person-chart-title">Top-Spiele nach Spielzeit</h3></div></div>
+                    <div class="bar-chart" role="img" aria-label="Balkendiagramm der Spiele mit der höchsten Spielzeit dieser Person">
+                        <div class="chart-row" th:each="game, chartStat : ${statistics.games}" th:if="${chartStat.index < 8}">
+                            <span class="chart-label" th:text="${game.game.name}">Spiel</span>
+                            <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${statistics.games[0].totalMinutes == 0 ? 0 : game.totalMinutes * 100.0 / statistics.games[0].totalMinutes}%|"></span></span>
+                            <strong class="chart-value" th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel mb-4" th:if="${!statistics.favoriteCoPlayers.empty}">
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Bestes Team</p><h3 class="h5 mb-0">Häufigste Mitspielende</h3></div></div>
+                    <div class="co-player-grid">
+                        <div class="co-player" th:each="coPlayer : ${statistics.favoriteCoPlayers}">
+                            <strong th:text="${coPlayer.displayName}">Name</strong>
+                            <span th:text="${coPlayer.plays + ' gemeinsame Partien'}">0 gemeinsame Partien</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Spieleprofil</p><h3 class="h5 mb-0">Bilanz pro Spiel</h3></div></div>
+                    <div class="table-responsive">
+                        <table class="table app-table align-middle mb-0">
+                            <thead><tr><th>Spiel</th><th>Partien</th><th>Zeit</th><th>Siege</th><th>Zeitraum</th></tr></thead>
+                            <tbody><tr th:each="game : ${statistics.games}">
+                                <td th:text="${game.game.name}">Spiel</td><td th:text="${game.plays}">0</td>
+                                <td th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</td><td th:text="${game.wins}">0</td>
+                                <td th:text="${@humanDuration.formatBetween(game.firstPlay, game.lastPlay)}">–</td>
+                            </tr></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <section th:if="${statistics == null}" class="empty-state compact-empty">
+                <span class="empty-icon" aria-hidden="true">⌕</span>
+                <h2 class="h4">Person auswählen</h2>
+                <p class="mb-0">Wähle einen Treffer aus, um die persönliche Spielbilanz zu öffnen.</p>
+            </section>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

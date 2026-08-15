@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Spiele')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navigation(${activePage}, ${username})}"></nav>
+<main>
+    <section class="hero-section">
+        <div class="container py-5 py-lg-6">
+            <div class="row align-items-end g-4">
+                <div class="col-lg-8">
+                    <p class="eyebrow mb-2">BoardGameGeek · <span th:text="${username}">User</span></p>
+                    <h1 class="display-5 fw-bold mb-3">Deine meistgespielten Welten.</h1>
+                    <p class="lead hero-copy mb-0">Alle Spiele mit mehr als <strong th:text="${statistics.threshold}">8</strong>
+                        Partien – sortiert nach der Zeit, die du ihnen gewidmet hast.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <span class="data-badge">Live aus deinem BGG-Spielverlauf</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container content-section">
+        <div th:if="${successMessage}" class="alert alert-success shadow-sm" role="alert" th:text="${successMessage}"></div>
+
+        <section class="metric-grid mb-5" aria-label="Übersicht">
+            <article class="metric-card">
+                <span class="metric-label">Qualifizierte Spiele</span>
+                <strong class="metric-value" th:text="${#numbers.formatInteger(statistics.games.size(), 1, 'POINT')}">0</strong>
+            </article>
+            <article class="metric-card">
+                <span class="metric-label">Partien insgesamt</span>
+                <strong class="metric-value" th:text="${#numbers.formatInteger(statistics.totalPlays, 1, 'POINT')}">0</strong>
+            </article>
+            <article class="metric-card metric-card-wide">
+                <span class="metric-label">Gesamtzeit</span>
+                <strong class="metric-value metric-value-text" th:text="${@humanDuration.formatMinutes(statistics.totalMinutes)}">0 Minuten</strong>
+            </article>
+            <article class="metric-card">
+                <span class="metric-label">Siege</span>
+                <strong class="metric-value" th:text="${#numbers.formatInteger(statistics.totalWins, 1, 'POINT')}">0</strong>
+            </article>
+        </section>
+
+        <section th:if="${!statistics.games.empty}">
+            <section class="panel chart-panel mb-5" aria-labelledby="overview-chart-title">
+                <div class="panel-heading compact">
+                    <div><p class="eyebrow text-accent mb-1">Zeitvergleich</p><h2 class="h4 mb-0" id="overview-chart-title">Top-Spiele nach Spielzeit</h2></div>
+                    <span class="subtle-pill">Top 10</span>
+                </div>
+                <div class="bar-chart" role="img" aria-label="Balkendiagramm der zehn Spiele mit der höchsten Gesamtspielzeit">
+                    <div class="chart-row" th:each="game, chartStat : ${statistics.games}" th:if="${chartStat.index < 10}">
+                        <span class="chart-label" th:text="${game.game.name}">Spiel</span>
+                        <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${statistics.games[0].totalMinutes == 0 ? 0 : game.totalMinutes * 100.0 / statistics.games[0].totalMinutes}%|"></span></span>
+                        <strong class="chart-value" th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</strong>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-heading mb-4">
+                <div>
+                    <p class="eyebrow text-accent mb-1">Hall of playtime</p>
+                    <h2 class="h3 mb-0">Spiele nach Gesamtzeit</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-12 col-md-6 col-xl-4" th:each="game, gameStat : ${statistics.games}">
+                    <article class="game-card h-100">
+                        <header class="game-card-header">
+                            <img class="game-card-cover" th:if="${!#strings.isEmpty(game.game.coverUrl)}"
+                                 th:src="${game.game.coverUrl}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                            <div class="game-rank" th:text="${gameStat.index + 1}">1</div>
+                            <a class="game-title stretched-link" target="_blank" rel="noopener"
+                               th:href="@{'https://boardgamegeek.com/boardgame/' + ${game.game.id}}"
+                               th:text="${game.game.name}">Spielname</a>
+                        </header>
+                        <div class="game-card-body">
+                            <dl class="stat-list">
+                                <div><dt>Partien</dt><dd th:text="${#numbers.formatInteger(game.plays, 1, 'POINT')}">0</dd></div>
+                                <div class="full-width"><dt>Gesamtzeit</dt><dd th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</dd></div>
+                                <div><dt>Erste Partie</dt><dd th:text="${#temporals.format(game.firstPlay, 'dd.MM.yyyy')}">01.01.2020</dd></div>
+                                <div><dt>Letzte Partie</dt><dd th:text="${#temporals.format(game.lastPlay, 'dd.MM.yyyy')}">01.01.2024</dd></div>
+                                <div class="full-width"><dt>Zeit dazwischen</dt><dd th:text="${@humanDuration.formatBetween(game.firstPlay, game.lastPlay)}">4 Jahre</dd></div>
+                                <div><dt>Siege</dt><dd th:text="${#numbers.formatInteger(game.wins, 1, 'POINT')}">0</dd></div>
+                                <div><dt>Lieblingsort</dt><dd th:text="${game.favoriteLocation}">Zuhause</dd></div>
+                                <div th:if="${game.game.averageRating != null}"><dt>BGG-Wertung</dt><dd th:text="${#numbers.formatDecimal(game.game.averageRating, 1, 1, 'COMMA') + ' / 10'}">0 / 10</dd></div>
+                                <div th:if="${game.game.complexity != null}"><dt>Komplexität</dt><dd th:text="${#numbers.formatDecimal(game.game.complexity, 1, 1, 'COMMA') + ' / 5'}">0 / 5</dd></div>
+                                <div th:if="${game.game.yearPublished != null}"><dt>Erschienen</dt><dd th:text="${game.game.yearPublished}">2020</dd></div>
+                                <div th:if="${game.game.minimumPlayers != null}"><dt>Spieler</dt><dd th:text="${game.game.maximumPlayers == null || game.game.minimumPlayers == game.game.maximumPlayers ? game.game.minimumPlayers : game.game.minimumPlayers + '–' + game.game.maximumPlayers}">2–4</dd></div>
+                                <div th:if="${game.game.playingTimeMinutes != null}"><dt>BGG-Spieldauer</dt><dd th:text="${@humanDuration.formatMinutes(game.game.playingTimeMinutes)}">60 Minuten</dd></div>
+                                <div th:if="${game.game.minimumAge != null}"><dt>Mindestalter</dt><dd th:text="${'ab ' + game.game.minimumAge}">ab 10</dd></div>
+                                <div th:if="${game.game.boardGameRank != null}"><dt>BGG-Rang</dt><dd th:text="${'#' + #numbers.formatInteger(game.game.boardGameRank, 1, 'POINT')}">#100</dd></div>
+                                <div class="full-width" th:if="${!game.game.categories.empty}"><dt>Kategorien</dt><dd class="tag-list"><span class="detail-tag" th:each="category : ${game.game.categories}" th:text="${category}">Kategorie</span></dd></div>
+                                <div class="full-width" th:if="${!game.game.mechanics.empty}"><dt>Mechaniken</dt><dd class="tag-list"><span class="detail-tag detail-tag-muted" th:each="mechanic, mechanicStat : ${game.game.mechanics}" th:if="${mechanicStat.index < 5}" th:text="${mechanic}">Mechanik</span></dd></div>
+                            </dl>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section th:if="${statistics.games.empty}" class="empty-state">
+            <span class="empty-icon" aria-hidden="true">◇</span>
+            <h2 class="h4">Noch kein Spiel über dem Schwellenwert</h2>
+            <p class="mb-0">Sobald ein Spiel mehr als <span th:text="${statistics.threshold}">8</span> Partien erreicht, erscheint es hier.</p>
+        </section>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${title})}"></head>
+<body class="error-page">
+<main class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
+    <section class="error-card">
+        <a class="navbar-brand d-inline-flex align-items-center gap-2 text-dark mb-5" th:href="@{/}">
+            <span class="brand-mark" aria-hidden="true">BG</span><span>Stats</span>
+        </a>
+        <p class="eyebrow text-accent mb-2">Das hat nicht geklappt</p>
+        <h1 class="display-6 fw-bold mb-3" th:text="${title}">Fehler</h1>
+        <p class="lead text-secondary mb-4" th:text="${message}">Fehlermeldung</p>
+        <div th:if="${configurationError}" class="configuration-hint mb-4">
+            <strong>Benötigte Umgebungsvariablen</strong>
+            <code>BGG_API_KEY=dein-api-token</code>
+            <code>BGG_USERNAME=dein-benutzername</code>
+        </div>
+        <a class="btn btn-primary" th:href="@{/}">Erneut versuchen</a>
+    </section>
+</main>
+</body>
+</html>

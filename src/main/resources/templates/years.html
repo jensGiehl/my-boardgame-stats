@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Jahresstatistik')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navigation(${activePage}, ${username})}"></nav>
+<main class="container content-section">
+    <header class="page-heading">
+        <div>
+            <p class="eyebrow text-accent mb-1">Im Wandel der Jahre</p>
+            <h1 class="display-6 fw-bold mb-2">Jahresstatistik</h1>
+            <p class="text-secondary mb-0">Spielrhythmus, Favoriten und alle Titel eines Jahres im Überblick.</p>
+        </div>
+        <form th:if="${!years.empty}" class="filter-form" th:action="@{/years}" method="get">
+            <label class="form-label" for="year">Jahr auswählen</label>
+            <div class="input-group">
+                <select class="form-select" id="year" name="year">
+                    <option th:each="availableYear : ${years}" th:value="${availableYear}"
+                            th:selected="${availableYear == selectedYear}" th:text="${availableYear}">2026</option>
+                </select>
+                <button class="btn btn-primary" type="submit">Anzeigen</button>
+            </div>
+        </form>
+    </header>
+
+    <div th:if="${statistics != null}">
+        <section class="metric-grid mb-4" aria-label="Kennzahlen des Jahres">
+            <article class="metric-card"><span class="metric-label">Partien</span><strong class="metric-value" th:text="${statistics.totalPlays}">0</strong></article>
+            <article class="metric-card"><span class="metric-label">Spiele</span><strong class="metric-value" th:text="${statistics.uniqueGames}">0</strong></article>
+            <article class="metric-card metric-card-wide"><span class="metric-label">Spielzeit</span><strong class="metric-value metric-value-text" th:text="${@humanDuration.formatMinutes(statistics.totalMinutes)}">0 Minuten</strong></article>
+            <article class="metric-card"><span class="metric-label">Siege</span><strong class="metric-value" th:text="${statistics.wins}">0</strong></article>
+            <article class="metric-card"><span class="metric-label">Aktive Tage</span><strong class="metric-value" th:text="${statistics.activeDays}">0</strong></article>
+            <article class="metric-card"><span class="metric-label">Orte</span><strong class="metric-value" th:text="${statistics.locations}">0</strong></article>
+        </section>
+
+        <section class="row g-3 mb-5">
+            <div class="col-12 col-md-4">
+                <article class="insight-card h-100"><span>Meistgespielt</span><strong th:text="${statistics.favoriteGame}">–</strong></article>
+            </div>
+            <div class="col-6 col-md-4">
+                <article class="insight-card h-100"><span>Stärkster Monat</span><strong th:text="${statistics.busiestMonth}">–</strong></article>
+            </div>
+            <div class="col-6 col-md-4">
+                <article class="insight-card h-100"><span>Ø pro Partie</span><strong th:text="${@humanDuration.formatMinutes(statistics.averageMinutes)}">–</strong></article>
+            </div>
+        </section>
+
+        <section class="panel chart-panel mb-5" aria-labelledby="year-chart-title">
+            <div class="panel-heading compact">
+                <div><p class="eyebrow text-accent mb-1">Spielrhythmus</p><h2 class="h4 mb-0" id="year-chart-title">Partien pro Monat</h2></div>
+                <span class="subtle-pill" th:text="${statistics.year}">2026</span>
+            </div>
+            <div class="bar-chart" role="img" th:aria-label="|Balkendiagramm der Partien pro Monat im Jahr ${statistics.year}|">
+                <div class="chart-row" th:each="month : ${statistics.monthlyActivity}">
+                    <span class="chart-label" th:text="${month.label}">Januar</span>
+                    <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${month.percentage}%|"></span></span>
+                    <strong class="chart-value" th:text="${month.plays + ' Partien'}">0 Partien</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow text-accent mb-1">Alle Titel</p>
+                    <h2 class="h4 mb-0" th:text="|'Spiele im Jahr ' + ${statistics.year}|">Spiele im Jahr</h2>
+                </div>
+                <span class="subtle-pill" th:text="${statistics.games.size() + ' Einträge'}">0 Einträge</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table app-table align-middle mb-0">
+                    <thead><tr><th>Spiel</th><th>Partien</th><th>Spielzeit</th><th>Siege</th><th>Erste / letzte Partie</th><th>Top-Ort</th></tr></thead>
+                    <tbody>
+                    <tr th:each="game : ${statistics.games}">
+                        <td><a class="table-game-link" target="_blank" rel="noopener"
+                               th:href="@{'https://boardgamegeek.com/boardgame/' + ${game.game.id}}" th:text="${game.game.name}">Spiel</a></td>
+                        <td th:text="${game.plays}">0</td>
+                        <td th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</td>
+                        <td th:text="${game.wins}">0</td>
+                        <td><span th:text="${#temporals.format(game.firstPlay, 'dd.MM.yyyy')}">–</span><span class="date-separator">→</span><span th:text="${#temporals.format(game.lastPlay, 'dd.MM.yyyy')}">–</span></td>
+                        <td th:text="${game.favoriteLocation}">–</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <section th:if="${years.empty}" class="empty-state">
+        <span class="empty-icon" aria-hidden="true">◇</span>
+        <h2 class="h4">Noch keine Partien vorhanden</h2>
+        <p class="mb-0">Für diesen BGG-Account wurden keine Plays gefunden.</p>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

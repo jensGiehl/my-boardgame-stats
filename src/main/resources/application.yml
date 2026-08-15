@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: bg-stats
+  main:
+    banner-mode: off
+  threads:
+    virtual:
+      enabled: true
+  thymeleaf:
+    cache: ${THYMELEAF_CACHE:true}
+  web:
+    resources:
+      cache:
+        period: 365d
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    whitelabel:
+      enabled: false
+
+bgg:
+  api-key: ${BGG_API_KEY:}
+  username: ${BGG_USERNAME:}
+  input-file: ${BGG_INPUT_FILE:}
+  snapshot-file: ${BGG_SNAPSHOT_FILE:bg-stats-data.json}
+  play-threshold: ${BGG_PLAY_THRESHOLD:8}
+  cache-ttl: ${BGG_CACHE_TTL:15m}
+  cover-batch-size: ${BGG_COVER_BATCH_SIZE:20}
+  client:
+    base-uri: ${BGG_BASE_URI:https://boardgamegeek.com/xmlapi2}
+    api-key-parameter: ${BGG_API_KEY_PARAMETER:apikey}
+    user-agent: ${BGG_USER_AGENT:bg-stats/1.0}
+    connect-timeout: ${BGG_CONNECT_TIMEOUT:10s}
+    request-timeout: ${BGG_REQUEST_TIMEOUT:60s}
+    max-retries: ${BGG_MAX_RETRIES:3}
+    retry-backoff: ${BGG_RETRY_BACKOFF:20s}
+
+logging:
+  level:
+    root: INFO
+    de.agiehl.bgstats: INFO
+    de.agiehl.bgg: WARN

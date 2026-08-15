@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Eigene Auswertung')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navigation(${activePage}, ${username})}"></nav>
+<main class="container content-section">
+    <header class="page-heading">
+        <div>
+            <p class="eyebrow text-accent mb-1">Deine Perspektive</p>
+            <h1 class="display-6 fw-bold mb-2">Eigene Statistik erstellen</h1>
+            <p class="text-secondary mb-0">Kombiniere Kategorie, Mitspieler, Zeitraum, Ort, Spiel und BGG-Wertung.</p>
+        </div>
+    </header>
+
+    <form class="panel filter-workbench mb-5" th:action="@{/custom}" method="get">
+        <div class="panel-heading compact">
+            <div><p class="eyebrow text-accent mb-1">Filter</p><h2 class="h4 mb-0">Welche Partien möchtest du untersuchen?</h2></div>
+            <span class="subtle-pill" th:text="${statistics.filters.active() ? 'Filter aktiv' : 'Alle Partien'}">Alle Partien</span>
+        </div>
+        <div class="filter-grid">
+            <div>
+                <label class="form-label" for="custom-year">Jahr</label>
+                <select class="form-select" id="custom-year" name="year">
+                    <option value="">Alle Jahre</option>
+                    <option th:each="year : ${options.years}" th:value="${year}" th:selected="${statistics.filters.year == year}" th:text="${year}">2026</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="custom-category">Kategorie</label>
+                <select class="form-select" id="custom-category" name="category">
+                    <option value="">Alle Kategorien</option>
+                    <option th:each="category : ${options.categories}" th:value="${category}" th:selected="${statistics.filters.category == category}" th:text="${category}">Strategie</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="custom-player">Mitspieler</label>
+                <select class="form-select" id="custom-player" name="player">
+                    <option value="">Alle Mitspielenden</option>
+                    <option th:each="participant : ${options.participants}" th:value="${participant.key}" th:selected="${statistics.filters.participant == participant.key}" th:text="${participant.displayName + ' (' + participant.plays + ')'}">Name</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="custom-location">Ort</label>
+                <select class="form-select" id="custom-location" name="location">
+                    <option value="">Alle Orte</option>
+                    <option th:each="place : ${options.locations}" th:value="${place}" th:selected="${statistics.filters.location == place}" th:text="${place}">Zuhause</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="custom-game">Spiel</label>
+                <select class="form-select" id="custom-game" name="game">
+                    <option value="">Alle Spiele</option>
+                    <option th:each="game : ${options.games}" th:value="${game.id}" th:selected="${statistics.filters.gameId == game.id}" th:text="${game.name}">Spiel</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="custom-rating">Mindestwertung</label>
+                <select class="form-select" id="custom-rating" name="minRating">
+                    <option value="">Beliebige BGG-Wertung</option>
+                    <option value="6" th:selected="${statistics.filters.minimumRating == 6.0}">Ab 6,0</option>
+                    <option value="7" th:selected="${statistics.filters.minimumRating == 7.0}">Ab 7,0</option>
+                    <option value="8" th:selected="${statistics.filters.minimumRating == 8.0}">Ab 8,0</option>
+                    <option value="9" th:selected="${statistics.filters.minimumRating == 9.0}">Ab 9,0</option>
+                </select>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-primary" type="submit">Statistik erstellen</button>
+            <a class="btn btn-outline-secondary" th:href="@{/custom}">Filter zurücksetzen</a>
+        </div>
+    </form>
+
+    <div th:if="${statistics.totalPlays > 0}">
+        <section class="metric-grid mb-4" aria-label="Kennzahlen der individuellen Statistik">
+            <article class="metric-card"><span class="metric-label">Partien</span><strong class="metric-value" th:text="${statistics.totalPlays}">0</strong></article>
+            <article class="metric-card"><span class="metric-label">Spiele</span><strong class="metric-value" th:text="${statistics.uniqueGames}">0</strong></article>
+            <article class="metric-card metric-card-wide"><span class="metric-label">Spielzeit</span><strong class="metric-value metric-value-text" th:text="${@humanDuration.formatMinutes(statistics.totalMinutes)}">0 Minuten</strong></article>
+            <article class="metric-card"><span class="metric-label">Siege</span><strong class="metric-value" th:text="${statistics.wins}">0</strong></article>
+            <article class="metric-card"><span class="metric-label">Siegquote</span><strong class="metric-value metric-value-small" th:text="${#numbers.formatDecimal(statistics.winRate, 1, 1, 'COMMA') + ' %'}">0 %</strong></article>
+            <article class="metric-card"><span class="metric-label">Spieltage</span><strong class="metric-value" th:text="${statistics.activeDays}">0</strong></article>
+        </section>
+
+        <section class="row g-3 mb-5">
+            <div class="col-12 col-sm-6 col-lg-3"><article class="insight-card h-100"><span>Favorit</span><strong th:text="${statistics.favoriteGame}">–</strong></article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="insight-card h-100"><span>Ø pro Partie</span><strong th:text="${@humanDuration.formatMinutes(statistics.averageMinutes)}">–</strong></article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="insight-card h-100"><span>Zeitraum</span><strong th:text="${@humanDuration.formatBetween(statistics.firstPlay, statistics.lastPlay)}">–</strong></article></div>
+            <div class="col-12 col-sm-6 col-lg-3" th:if="${statistics.averageRating != null}"><article class="insight-card h-100"><span>Ø BGG-Wertung</span><strong th:text="${#numbers.formatDecimal(statistics.averageRating, 1, 2, 'COMMA') + ' / 10'}">0 / 10</strong></article></div>
+        </section>
+
+        <section class="row g-4 mb-5">
+            <div class="col-12 col-xl-7">
+                <section class="panel chart-panel h-100" aria-labelledby="activity-chart-title">
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Verlauf</p><h2 class="h4 mb-0" id="activity-chart-title" th:text="${statistics.filters.year == null ? 'Partien pro Jahr' : 'Partien pro Monat'}">Partien im Zeitverlauf</h2></div></div>
+                    <div class="bar-chart" role="img" aria-label="Balkendiagramm der gefilterten Partien im Zeitverlauf">
+                        <div class="chart-row" th:each="period : ${statistics.activity}">
+                            <span class="chart-label" th:text="${period.label}">2026</span>
+                            <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${period.percentage}%|"></span></span>
+                            <strong class="chart-value" th:text="${period.plays + ' Partien'}">0 Partien</strong>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="col-12 col-xl-5" th:if="${!statistics.categories.empty}">
+                <section class="panel chart-panel h-100" aria-labelledby="category-chart-title">
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Genres</p><h2 class="h4 mb-0" id="category-chart-title">Häufigste Kategorien</h2></div></div>
+                    <div class="bar-chart compact-chart" role="img" aria-label="Balkendiagramm der häufigsten Kategorien">
+                        <div class="chart-row" th:each="category : ${statistics.categories}">
+                            <span class="chart-label" th:text="${category.name}">Kategorie</span>
+                            <span class="chart-track"><span class="chart-fill chart-fill-accent" th:style="|--chart-value: ${category.percentage}%|"></span></span>
+                            <strong class="chart-value" th:text="${category.plays}">0</strong>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading"><div><p class="eyebrow text-accent mb-1">Ergebnis</p><h2 class="h4 mb-0">Spiele in dieser Auswahl</h2></div><span class="subtle-pill" th:text="${statistics.games.size() == 1 ? '1 Spiel' : statistics.games.size() + ' Spiele'}">0 Spiele</span></div>
+            <div class="table-responsive">
+                <table class="table app-table custom-results-table align-middle mb-0">
+                    <thead><tr><th>Spiel</th><th>Kategorie</th><th>BGG-Wertung</th><th>Partien</th><th>Spielzeit</th><th>Siege</th><th>Top-Ort</th></tr></thead>
+                    <tbody><tr th:each="game : ${statistics.games}">
+                        <td><a class="table-game-link" target="_blank" rel="noopener" th:href="@{'https://boardgamegeek.com/boardgame/' + ${game.game.id}}" th:text="${game.game.name}">Spiel</a></td>
+                        <td th:text="${game.game.categories.empty ? '–' : #strings.listJoin(game.game.categories, ', ')}">–</td>
+                        <td th:text="${game.game.averageRating == null ? '–' : #numbers.formatDecimal(game.game.averageRating, 1, 1, 'COMMA')}">–</td>
+                        <td th:text="${game.plays}">0</td>
+                        <td th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</td>
+                        <td th:text="${game.wins}">0</td>
+                        <td th:text="${game.favoriteLocation}">–</td>
+                    </tr></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <section th:if="${statistics.totalPlays == 0}" class="empty-state">
+        <span class="empty-icon" aria-hidden="true">◇</span>
+        <h2 class="h4">Keine passenden Partien</h2>
+        <p class="mb-0">Lockere einen oder mehrere Filter, um wieder Ergebnisse zu erhalten.</p>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
