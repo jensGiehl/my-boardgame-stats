@@ -15,7 +15,8 @@ BG Stats ist eine mobile-first Spring-Boot-Webanwendung für persönliche BoardG
 - frei kombinierbare Auswertung nach Jahr, Kategorie, Mitspieler, Ort, Spiel und Mindestwertung
 - WhatsApp-formatierten Export je enthaltenem Spiel mit Partien, Spieltagen, Gesamt-, Maximal- und Durchschnittszeit sowie erstem, letztem und dazwischenliegendem Datum per Zwischenablage
 - BoardGameGeek-formatierten Export derselben Statistik mit BGG-Spielverlinkung und ohne Emojis
-- responsive Balkendiagramme auf allen Statistikseiten für schnelle visuelle Vergleiche
+- responsive Canvas-Diagramme auf allen Statistikseiten, die jeweils als PNG gespeichert werden können
+- Personenstatistik mit einem Kreisdiagramm der zehn meistgespielten Spiele, BGG-Covern als Segmentfüllung und einer Sammelkategorie für alle übrigen Spiele
 - asynchrones Laden des vollständigen Datenbestands beim Anwendungsstart mit einer automatisch verschwindenden Warteansicht
 - zeitbasierter In-Memory-Cache und manuelle Aktualisierung in der Navigation
 - JSON-Snapshot aller vollständig geladenen Daten für die lokale Entwicklung ohne BGG-API-Aufrufe
@@ -140,6 +141,7 @@ Ist das Package in GitHub noch privat, muss es unter **Packages → Package sett
 - Maven
 - Thymeleaf
 - Bootstrap als WebJar
+- Chart.js als WebJar
 - bggClient `v1.0.0-1` über JitPack
 
 Der API-Client ist in einer Gateway-Schicht gekapselt. Die Statistiklogik arbeitet auf eigenen unveränderlichen Domänenobjekten und ist dadurch unabhängig von HTTP und Templates testbar.

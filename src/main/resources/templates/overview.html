@@ -46,14 +46,11 @@
             <section class="panel chart-panel mb-5" aria-labelledby="overview-chart-title">
                 <div class="panel-heading compact">
                     <div><p class="eyebrow text-accent mb-1">Zeitvergleich</p><h2 class="h4 mb-0" id="overview-chart-title">Top-Spiele nach Spielzeit</h2></div>
-                    <span class="subtle-pill">Top 10</span>
+                    <div class="chart-actions"><span class="subtle-pill">Top 10</span><button class="btn btn-sm btn-outline-secondary chart-save" type="button" data-chart-save="overview-playtime">Speichern</button></div>
                 </div>
-                <div class="bar-chart" role="img" aria-label="Balkendiagramm der zehn Spiele mit der höchsten Gesamtspielzeit">
-                    <div class="chart-row" th:each="game, chartStat : ${statistics.games}" th:if="${chartStat.index < 10}">
-                        <span class="chart-label" th:text="${game.game.name}">Spiel</span>
-                        <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${statistics.games[0].totalMinutes == 0 ? 0 : game.totalMinutes * 100.0 / statistics.games[0].totalMinutes}%|"></span></span>
-                        <strong class="chart-value" th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</strong>
-                    </div>
+                <div class="canvas-chart canvas-chart-wide" role="img" aria-label="Balkendiagramm der zehn Spiele mit der höchsten Gesamtspielzeit">
+                    <canvas id="overview-playtime" data-chart="bar" data-unit="minutes"></canvas>
+                    <div class="chart-data" hidden><span th:each="game, chartStat : ${statistics.games}" th:if="${chartStat.index < 10}" th:data-label="${game.game.name}" th:data-value="${game.totalMinutes}"></span></div>
                 </div>
             </section>
 

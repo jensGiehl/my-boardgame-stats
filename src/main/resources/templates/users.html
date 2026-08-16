@@ -65,13 +65,10 @@
                 </section>
 
                 <section class="panel chart-panel mb-4" th:if="${!statistics.games.empty}" aria-labelledby="person-chart-title">
-                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Spielprofil</p><h3 class="h5 mb-0" id="person-chart-title">Top-Spiele nach Spielzeit</h3></div></div>
-                    <div class="bar-chart" role="img" aria-label="Balkendiagramm der Spiele mit der höchsten Spielzeit dieser Person">
-                        <div class="chart-row" th:each="game, chartStat : ${statistics.games}" th:if="${chartStat.index < 8}">
-                            <span class="chart-label" th:text="${game.game.name}">Spiel</span>
-                            <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${statistics.games[0].totalMinutes == 0 ? 0 : game.totalMinutes * 100.0 / statistics.games[0].totalMinutes}%|"></span></span>
-                            <strong class="chart-value" th:text="${@humanDuration.formatMinutes(game.totalMinutes)}">0 Minuten</strong>
-                        </div>
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Spielprofil</p><h3 class="h5 mb-0" id="person-chart-title">Meistgespielte Spiele</h3></div><button class="btn btn-sm btn-outline-secondary chart-save" type="button" data-chart-save="person-games">Speichern</button></div>
+                    <div class="canvas-chart canvas-chart-pie" role="img" aria-label="Kuchendiagramm der zehn meistgespielten Spiele dieser Person und aller sonstigen Spiele">
+                        <canvas id="person-games" data-chart="cover-pie" data-unit="plays"></canvas>
+                        <div class="chart-data" hidden><span th:each="game : ${statistics.games}" th:data-label="${game.game.name}" th:data-value="${game.plays}" th:data-image="@{/covers/{id}(id=${game.game.id})}"></span></div>
                     </div>
                 </section>
 

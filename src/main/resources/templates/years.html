@@ -47,14 +47,11 @@
         <section class="panel chart-panel mb-5" aria-labelledby="year-chart-title">
             <div class="panel-heading compact">
                 <div><p class="eyebrow text-accent mb-1">Spielrhythmus</p><h2 class="h4 mb-0" id="year-chart-title">Partien pro Monat</h2></div>
-                <span class="subtle-pill" th:text="${statistics.year}">2026</span>
+                <div class="chart-actions"><span class="subtle-pill" th:text="${statistics.year}">2026</span><button class="btn btn-sm btn-outline-secondary chart-save" type="button" data-chart-save="year-activity">Speichern</button></div>
             </div>
-            <div class="bar-chart" role="img" th:aria-label="|Balkendiagramm der Partien pro Monat im Jahr ${statistics.year}|">
-                <div class="chart-row" th:each="month : ${statistics.monthlyActivity}">
-                    <span class="chart-label" th:text="${month.label}">Januar</span>
-                    <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${month.percentage}%|"></span></span>
-                    <strong class="chart-value" th:text="${month.plays + ' Partien'}">0 Partien</strong>
-                </div>
+            <div class="canvas-chart canvas-chart-wide" role="img" th:aria-label="|Balkendiagramm der Partien pro Monat im Jahr ${statistics.year}|">
+                <canvas id="year-activity" data-chart="bar" data-unit="plays"></canvas>
+                <div class="chart-data" hidden><span th:each="month : ${statistics.monthlyActivity}" th:data-label="${month.label}" th:data-value="${month.plays}"></span></div>
             </div>
         </section>
 

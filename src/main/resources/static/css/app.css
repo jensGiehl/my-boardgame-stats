@@ -340,6 +340,36 @@ a {
     min-width: 0;
 }
 
+.chart-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+    align-items: center;
+}
+
+.chart-save {
+    min-width: 6.5rem;
+}
+
+.canvas-chart {
+    position: relative;
+    height: 20rem;
+    padding: 1rem;
+}
+
+.canvas-chart-wide {
+    height: 25rem;
+}
+
+.canvas-chart-pie {
+    height: 28rem;
+}
+
+.canvas-chart canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .bar-chart {
     display: grid;
     gap: 1.1rem;

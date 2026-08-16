@@ -58,13 +58,10 @@
     </section>
 
     <section class="panel chart-panel mb-5" th:if="${!locations.empty}" aria-labelledby="location-chart-title">
-        <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Ortsvergleich</p><h2 class="h4 mb-0" id="location-chart-title">Spielzeit nach Ort</h2></div><span class="subtle-pill">Top 10</span></div>
-        <div class="bar-chart" role="img" aria-label="Balkendiagramm der zehn Orte mit der höchsten Spielzeit">
-            <div class="chart-row" th:each="place, chartStat : ${locations}" th:if="${chartStat.index < 10}">
-                <span class="chart-label" th:text="${place.name}">Ort</span>
-                <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${locations[0].totalMinutes == 0 ? 0 : place.totalMinutes * 100.0 / locations[0].totalMinutes}%|"></span></span>
-                <strong class="chart-value" th:text="${@humanDuration.formatMinutes(place.totalMinutes)}">0 Minuten</strong>
-            </div>
+        <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Ortsvergleich</p><h2 class="h4 mb-0" id="location-chart-title">Spielzeit nach Ort</h2></div><div class="chart-actions"><span class="subtle-pill">Top 10</span><button class="btn btn-sm btn-outline-secondary chart-save" type="button" data-chart-save="location-playtime">Speichern</button></div></div>
+        <div class="canvas-chart canvas-chart-wide" role="img" aria-label="Balkendiagramm der zehn Orte mit der höchsten Spielzeit">
+            <canvas id="location-playtime" data-chart="bar" data-unit="minutes"></canvas>
+            <div class="chart-data" hidden><span th:each="place, chartStat : ${locations}" th:if="${chartStat.index < 10}" th:data-label="${place.name}" th:data-value="${place.totalMinutes}"></span></div>
         </div>
     </section>
 

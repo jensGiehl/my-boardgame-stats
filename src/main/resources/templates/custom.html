@@ -121,25 +121,19 @@
         <section class="row g-4 mb-5">
             <div class="col-12 col-xl-7">
                 <section class="panel chart-panel h-100" aria-labelledby="activity-chart-title">
-                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Verlauf</p><h2 class="h4 mb-0" id="activity-chart-title" th:text="${statistics.filters.year == null ? 'Partien pro Jahr' : 'Partien pro Monat'}">Partien im Zeitverlauf</h2></div></div>
-                    <div class="bar-chart" role="img" aria-label="Balkendiagramm der gefilterten Partien im Zeitverlauf">
-                        <div class="chart-row" th:each="period : ${statistics.activity}">
-                            <span class="chart-label" th:text="${period.label}">2026</span>
-                            <span class="chart-track"><span class="chart-fill" th:style="|--chart-value: ${period.percentage}%|"></span></span>
-                            <strong class="chart-value" th:text="${period.plays + ' Partien'}">0 Partien</strong>
-                        </div>
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Verlauf</p><h2 class="h4 mb-0" id="activity-chart-title" th:text="${statistics.filters.year == null ? 'Partien pro Jahr' : 'Partien pro Monat'}">Partien im Zeitverlauf</h2></div><button class="btn btn-sm btn-outline-secondary chart-save" type="button" data-chart-save="custom-activity">Speichern</button></div>
+                    <div class="canvas-chart" role="img" aria-label="Balkendiagramm der gefilterten Partien im Zeitverlauf">
+                        <canvas id="custom-activity" data-chart="bar" data-unit="plays"></canvas>
+                        <div class="chart-data" hidden><span th:each="period : ${statistics.activity}" th:data-label="${period.label}" th:data-value="${period.plays}"></span></div>
                     </div>
                 </section>
             </div>
             <div class="col-12 col-xl-5" th:if="${!statistics.categories.empty}">
                 <section class="panel chart-panel h-100" aria-labelledby="category-chart-title">
-                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Genres</p><h2 class="h4 mb-0" id="category-chart-title">Häufigste Kategorien</h2></div></div>
-                    <div class="bar-chart compact-chart" role="img" aria-label="Balkendiagramm der häufigsten Kategorien">
-                        <div class="chart-row" th:each="category : ${statistics.categories}">
-                            <span class="chart-label" th:text="${category.name}">Kategorie</span>
-                            <span class="chart-track"><span class="chart-fill chart-fill-accent" th:style="|--chart-value: ${category.percentage}%|"></span></span>
-                            <strong class="chart-value" th:text="${category.plays}">0</strong>
-                        </div>
+                    <div class="panel-heading compact"><div><p class="eyebrow text-accent mb-1">Genres</p><h2 class="h4 mb-0" id="category-chart-title">Häufigste Kategorien</h2></div><button class="btn btn-sm btn-outline-secondary chart-save" type="button" data-chart-save="custom-categories">Speichern</button></div>
+                    <div class="canvas-chart" role="img" aria-label="Balkendiagramm der häufigsten Kategorien">
+                        <canvas id="custom-categories" data-chart="bar" data-unit="plays" data-accent="true"></canvas>
+                        <div class="chart-data" hidden><span th:each="category : ${statistics.categories}" th:data-label="${category.name}" th:data-value="${category.plays}"></span></div>
                     </div>
                 </section>
             </div>
@@ -171,6 +165,6 @@
     </section>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
-<script th:src="@{/js/custom-statistics.js(v=20260815-2)}"></script>
+<script th:src="@{/js/custom-statistics.js(v=202608152)}"></script>
 </body>
 </html>

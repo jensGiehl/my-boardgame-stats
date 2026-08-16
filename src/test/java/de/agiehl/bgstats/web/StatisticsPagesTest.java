@@ -57,7 +57,8 @@ class StatisticsPagesTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Catan")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
                         "src=\"https://cf.geekdo-images.com/example/filters:format(jpeg)/catan.jpg\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("style=\"--chart-value: 100.0%\"")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-chart=\"bar\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-chart-save=\"overview-playtime\"")));
         mockMvc.perform(get("/years"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Jahresstatistik")))
@@ -65,7 +66,14 @@ class StatisticsPagesTest {
                         "aria-label=\"Balkendiagramm der Partien pro Monat im Jahr 2026\"")));
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Statistik pro Person")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Statistik pro Person")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "Kuchendiagramm der zehn meistgespielten Spiele")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-chart=\"cover-pie\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-image=\"/covers/13\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-chart-save=\"person-games\"")));
+        mockMvc.perform(get("/covers/999999"))
+                .andExpect(status().isNotFound());
         mockMvc.perform(get("/locations"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Zuhause")));
@@ -79,6 +87,16 @@ class StatisticsPagesTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("*Verschiedene Spieltage:* 1")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("*Max. Spielzeit an einem Tag:* 2 Stunden und 30 Minuten")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Häufigste Kategorien")));
+    }
+
+    @Test
+    void servesChartAssets() throws Exception {
+        mockMvc.perform(get("/webjars/chart.js/4.5.1/dist/chart.umd.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Chart")));
+        mockMvc.perform(get("/js/charts.js").param("v", "202608163"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("createCoverPie")));
     }
 
     @TestConfiguration(proxyBeanMethods = false)

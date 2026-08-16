@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#10251d">
     <title th:text="${title + ' · BG Stats'}">BG Stats</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/app.css(v=20260815-3)}">
+    <link rel="stylesheet" th:href="@{/css/app.css(v=202608162)}">
 </head>
 <body>
 <nav th:fragment="navigation(activePage, username)" class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
@@ -41,6 +41,8 @@
         <a href="https://boardgamegeek.com" target="_blank" rel="noopener">Daten von BoardGameGeek</a>
     </div>
     <script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webjars/chart.js/4.5.1/dist/chart.umd.js}"></script>
+    <script th:src="@{/js/charts.js(v=202608163)}"></script>
 </footer>
 </body>
 </html>
